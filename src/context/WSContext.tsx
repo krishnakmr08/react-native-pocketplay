@@ -15,9 +15,13 @@ import { io, Socket } from "socket.io-client";
 
 interface WSService {
   emit: (event: string, data?: unknown) => void;
-  on: (event: string, callback: (data: unknown) => void) => void;
-  off: (event: string, callback?: (data: unknown) => void) => void;
+
+  on: <T>(event: string, callback: (data: T) => void) => void;
+
+  off: <T>(event: string, callback?: (data: T) => void) => void;
+
   disconnect: () => void;
+
   refreshAndReconnectSocket: () => Promise<void>;
 }
 
@@ -29,6 +33,7 @@ const WSContext = createContext<WSService | null>(null);
 
 export const WSProvider: FC<WSProviderProps> = ({ children }) => {
   const socketRef = useRef<Socket | null>(null);
+
   const isRefreshingRef = useRef(false);
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -86,10 +91,12 @@ export const WSProvider: FC<WSProviderProps> = ({ children }) => {
 
     socketRef.current = socket;
 
+    // Socket connected
     socket.on("connect", () => {
       console.log("Socket connected:", socket.id);
     });
 
+    // Socket connection error
     socket.on("connect_error", async (error) => {
       console.log("Socket connect error:", error.message);
 
@@ -98,6 +105,7 @@ export const WSProvider: FC<WSProviderProps> = ({ children }) => {
       }
     });
 
+    // Cleanup
     return () => {
       socket.disconnect();
 
@@ -113,19 +121,21 @@ export const WSProvider: FC<WSProviderProps> = ({ children }) => {
   };
 
   // Listen to event
-  const on = (event: string, callback: (data: unknown) => void): void => {
+  const on = <T,>(event: string, callback: (data: T) => void): void => {
     socketRef.current?.off(event, callback);
+
     socketRef.current?.on(event, callback);
   };
 
   // Remove event listener
-  const off = (event: string, callback?: (data: unknown) => void): void => {
+  const off = <T,>(event: string, callback?: (data: T) => void): void => {
     socketRef.current?.off(event, callback);
   };
 
   // Disconnect socket
   const disconnect = (): void => {
     socketRef.current?.disconnect();
+
     socketRef.current = null;
   };
 

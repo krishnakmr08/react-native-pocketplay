@@ -14,26 +14,25 @@ interface LikeCountProps {
   setInitialValue: Dispatch<SetStateAction<PlayInteraction | null>>;
 }
 
+interface LikesUpdate {
+  playId: string;
+  likes: number;
+}
+
 const LikeCount: FC<LikeCountProps> = ({ initialValue, setInitialValue }) => {
   const socketService = useWS();
 
   useEffect(() => {
-    const handleLikesUpdate = ({
-      playId,
-      likes,
-    }: {
-      playId: string;
-      likes: number;
-    }) => {
+    const handleLikesUpdate = ({ playId, likes }: LikesUpdate) => {
       if (playId === initialValue._id) {
         setInitialValue((prev) => (prev ? { ...prev, likes } : prev));
       }
     };
 
-    socketService.on("stream-likes", handleLikesUpdate);
+    socketService.on<LikesUpdate>("stream-likes", handleLikesUpdate);
 
     return () => {
-      socketService.off("stream-likes", handleLikesUpdate);
+      socketService.off<LikesUpdate>("stream-likes", handleLikesUpdate);
     };
   }, [socketService, setInitialValue, initialValue._id]);
 

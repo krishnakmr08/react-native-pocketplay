@@ -1,9 +1,7 @@
 import { useWS } from "@/context/WSContext";
-
 import { commonStyles } from "@/styles/commonStyles";
 import { interactionStyles } from "@/styles/interactionStyles";
 import { Comment, Play, PlayInteraction } from "@/types/play";
-
 import React, { FC, memo, useEffect, useState } from "react";
 import { View } from "react-native";
 import CommentCount from "./CommentCount";
@@ -22,7 +20,7 @@ const Interactions: FC<{ item: Play }> = ({ item }) => {
   );
 
   useEffect(() => {
-    if (!socketService || !_id) return;
+    if (!_id) return;
 
     const handlePlayInfo = (data: PlayInteraction) => {
       setInitialValue(data);
@@ -32,15 +30,22 @@ const Interactions: FC<{ item: Play }> = ({ item }) => {
       setInitialValue((prev) => (prev ? { ...prev, comments } : prev));
     };
 
-    socketService.emit("join-stream", { playId: _id });
-    socketService.emit("get-play-info", { playId: _id });
+    socketService.emit("join-stream", {
+      playId: _id,
+    });
 
-    socketService.on("stream-play-info", handlePlayInfo);
-    socketService.on("stream-comments", handleComments);
+    socketService.emit("get-play-info", {
+      playId: _id,
+    });
+
+    socketService.on<PlayInteraction>("stream-play-info", handlePlayInfo);
+
+    socketService.on<Comment[]>("stream-comments", handleComments);
 
     return () => {
-      socketService.off("stream-play-info", handlePlayInfo);
-      socketService.off("stream-comments", handleComments);
+      socketService.off<PlayInteraction>("stream-play-info", handlePlayInfo);
+
+      socketService.off<Comment[]>("stream-comments", handleComments);
     };
   }, [_id, socketService]);
 
