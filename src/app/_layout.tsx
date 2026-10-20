@@ -1,18 +1,40 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { WSProvider } from "@/context/WSContext";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
-
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+const RootLayout = () => {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <StatusBar style="light" />
+
+      <WSProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+
+          <Stack.Screen
+            name="auth"
+            options={{
+              animation: "fade",
+              animationDuration: 1000,
+              animationTypeForReplace: "push",
+            }}
+          />
+
+          <Stack.Screen
+            name="home"
+            options={{
+              animation: "fade",
+              animationDuration: 1000,
+              animationTypeForReplace: "push",
+            }}
+          />
+
+          <Stack.Screen name="playlist" />
+        </Stack>
+      </WSProvider>
+    </SafeAreaProvider>
   );
-}
+};
+
+export default RootLayout;
