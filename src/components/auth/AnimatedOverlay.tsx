@@ -1,0 +1,22 @@
+import { authStyles } from "@/styles/authStyles";
+import { Animated } from "react-native";
+
+interface Props {
+  overlayOpacity: Animated.Value;
+}
+
+const AnimatedOverlay = ({ overlayOpacity }: Props) => {
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        authStyles.overlay,
+        {
+          opacity: overlayOpacity,
+        },
+      ]}
+    />
+  );
+};
+
+export default AnimatedOverlay;

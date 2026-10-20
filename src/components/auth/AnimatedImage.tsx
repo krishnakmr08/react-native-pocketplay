@@ -1,0 +1,22 @@
+import { authStyles } from "@/styles/authStyles";
+import { Animated } from "react-native";
+
+interface Props {
+  shakeAnim: Animated.Value;
+}
+
+const AnimatedImage = ({ shakeAnim }: Props) => {
+  return (
+    <Animated.Image
+      source={require("@/assets/images/aniverse.png")}
+      style={[
+        authStyles.image,
+        {
+          transform: [{ translateX: shakeAnim }],
+        },
+      ]}
+    />
+  );
+};
+
+export default AnimatedImage;
